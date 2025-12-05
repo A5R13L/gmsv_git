@@ -52,5 +52,5 @@ jobs:
                   repo_name: A5R13L/gmsv_git
                   repo_token: ${{ secrets.RELEASE_ACCESS_TOKEN }}
                   body: "gmsv_git"
-                  file: projects/x64/linux/gmake2/x86/ReleaseWithSymbols/gmsv_git_64_linux.dll
+                  file: projects/x64/linux/gmake2/x86_64/ReleaseWithSymbols/gmsv_git_64_linux64.dll
                   asset_name: gmsv_git_linux64.dll
