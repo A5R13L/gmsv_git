@@ -4,7 +4,7 @@ A Garry's Mod module that integrates Git into your server.
 
 # Authorization
 
-Placing a file named `git.token` with a PAT (Personal Access Token) will allow Git to access private repositories.
+Placing a file named `git.token` in the /garrysmod folder with a PAT (Personal Access Token) will allow Git to access private repositories.
 
 # API
 
