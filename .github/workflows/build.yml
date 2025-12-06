@@ -1,4 +1,4 @@
-name: build_linux32
+name: build
 
 on:
     push:
