@@ -45,7 +45,7 @@ jobs:
                   cp libgit2_src/build32/libgit2.a source/thirdparty/libgit2/libs/x32
                   premake5 gmake2 --tag_version="${{ github.ref_name }}"
                   cd projects/x32/linux/gmake2
-                  make config=releasewithsymbols_x86 CXX="g++-10 -m32 -fPIC" CXXFLAGS="-std=c++17 -m32 -fPIC"
+                  make config=releasewithsymbols_x86 CXX="g++-10 -m32" CXXFLAGS="-std=c++17 -m32"
             - name: Release
               uses: svenstaro/upload-release-action@2.7.0
               with:
@@ -92,7 +92,7 @@ jobs:
                 cp libgit2_src/build64/libgit2.a source/thirdparty/libgit2/libs/x64
                 premake5 gmake2 --tag_version="${{ github.ref_name }}"
                 cd projects/x64/linux/gmake2
-                make config=releasewithsymbols_x86_64 CXX="g++-10 -m64 -fPIC" CXXFLAGS="-std=c++17 -m64 -fPIC"
+                make config=releasewithsymbols_x86_64 CXX="g++-10 -m64" CXXFLAGS="-std=c++17 -m64"
             - name: Release
               uses: svenstaro/upload-release-action@2.7.0
               with:
