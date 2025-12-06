@@ -22,7 +22,7 @@ local function PostSetup(bits)
 		links{"git2", "ssl", "crypto", "z", "pthread"}
 
 	filter("system:windows")
-		links{"git2", "bcrypt", "crypt32", "ws2_32"}
+		links{"git2", "bcrypt", "crypt32", "ws2_32", "winhttp"}
 
 	filter{}
 	defines{"GIT_VERSION=\"" .. (_OPTIONS["tag_version"] or "unknown") .. "\""}

@@ -23,13 +23,13 @@ jobs:
                   tar xf zlib-1.3.1.tar.gz
                   cd zlib-1.3.1
                   mkdir build32 && cd build32
-                  CFLAGS="-m32" ../configure --static
+                  CFLAGS="-m32 -fPIC" ../configure --static
                   make -j$(nproc)
                   cd ../..
                   wget https://www.openssl.org/source/openssl-1.1.1w.tar.gz
                   tar xf openssl-1.1.1w.tar.gz
                   cd openssl-1.1.1w
-                  ./Configure linux-generic32 no-shared no-tests no-threads --prefix=$PWD/dist32 CFLAGS="-m32" LDFLAGS="-m32"
+                  ./Configure linux-generic32 no-shared no-tests no-threads --prefix=$PWD/dist32 CFLAGS="-m32 -fPIC" LDFLAGS="-m32 -fPIC"
                   make -j$(nproc)
                   make install_sw
                   cd ..
@@ -45,7 +45,7 @@ jobs:
                   cp libgit2_src/build32/libgit2.a source/thirdparty/libgit2/libs/x32
                   premake5 gmake2 --tag_version="${{ github.ref_name }}"
                   cd projects/x32/linux/gmake2
-                  make config=releasewithsymbols_x86 CXX="g++-10 -m32" CXXFLAGS="-std=c++17 -m32"
+                  make config=releasewithsymbols_x86 CXX="g++-10 -m32 -fPIC" CXXFLAGS="-std=c++17 -m32 -fPIC"
             - name: Release
               uses: svenstaro/upload-release-action@2.7.0
               with:
@@ -70,13 +70,13 @@ jobs:
                 tar xf zlib-1.3.1.tar.gz
                 cd zlib-1.3.1
                 mkdir build64 && cd build64
-                CFLAGS="-m64" ../configure --static
+                CFLAGS="-m64 -fPIC" ../configure --static
                 make -j$(nproc)
                 cd ../..
                 wget https://www.openssl.org/source/openssl-1.1.1w.tar.gz
                 tar xf openssl-1.1.1w.tar.gz
                 cd openssl-1.1.1w
-                ./Configure linux-generic64 no-shared no-tests no-threads --prefix=$PWD/dist64 CFLAGS="-m64" LDFLAGS="-m64"
+                ./Configure linux-generic64 no-shared no-tests no-threads --prefix=$PWD/dist64 CFLAGS="-m64 -fPIC" LDFLAGS="-m64 -fPIC"
                 make -j$(nproc)
                 make install_sw
                 cd ..
@@ -92,7 +92,7 @@ jobs:
                 cp libgit2_src/build64/libgit2.a source/thirdparty/libgit2/libs/x64
                 premake5 gmake2 --tag_version="${{ github.ref_name }}"
                 cd projects/x64/linux/gmake2
-                make config=releasewithsymbols_x86_64 CXX="g++-10 -m64" CXXFLAGS="-std=c++17 -m64"
+                make config=releasewithsymbols_x86_64 CXX="g++-10 -m64 -fPIC" CXXFLAGS="-std=c++17 -m64 -fPIC"
             - name: Release
               uses: svenstaro/upload-release-action@2.7.0
               with:
