@@ -130,7 +130,7 @@ jobs:
                 repo_name: A5R13L/gmsv_git
                 repo_token: ${{ secrets.RELEASE_ACCESS_TOKEN }}
                 body: "gmsv_git"
-                file: projects/x32/windows/vs2022/x32/ReleaseWithSymbols/gmsv_git_32_win32.dll
+                file: projects/x32/windows/vs2022/x86/ReleaseWithSymbols/gmsv_git_32_win32.dll
                 asset_name: gmsv_git_win32.dll
     build_windows64:
         runs-on: windows-latest
