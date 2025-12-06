@@ -44,7 +44,8 @@ apt-get install -y \
   g++-multilib \
   cmake \
   make \
-  curl
+  curl \
+  git
 
 wget https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-linux.tar.gz
 tar xf premake-5.0.0-beta2-linux.tar.gz
