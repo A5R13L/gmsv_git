@@ -11,13 +11,20 @@ newoption({
 
 local function PostSetup(bits)
 	includedirs{"source/thirdparty/libgit2/include"}
+
 	if bits == 64 then
 		libdirs{"source/thirdparty/libgit2/libs/x64"}
 	else
 		libdirs{"source/thirdparty/libgit2/libs/x32"}
 	end
 
-	links{"git2", "ssl", "crypto", "z", "pthread"}
+	filter("system:linux")
+		links{"git2", "ssl", "crypto", "z", "pthread"}
+
+	filter("system:windows")
+		links{"git2", "bcrypt", "crypt32", "ws2_32"}
+
+	filter{}
 	defines{"GIT_VERSION=\"" .. (_OPTIONS["tag_version"] or "unknown") .. "\""}
 end
 

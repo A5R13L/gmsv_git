@@ -36,7 +36,7 @@ void Log(const char *Format, ...)
     std::string Formatted = ReplaceColorCodes(Buffer);
     std::string Suffix = ReplaceColorCodes("{white}\n");
 
-    std::cout << Prefix.c_str() << Formatted.c_str() << Suffix.c_str() << std::endl;
+    std::cout << Prefix.c_str() << Formatted.c_str() << Suffix.c_str();
     va_end(Arguments);
 }
 
@@ -52,7 +52,7 @@ void Log(const std::string Format, ...)
     std::string Formatted = ReplaceColorCodes(Buffer);
     std::string Suffix = ReplaceColorCodes("{white}\n");
 
-    std::cout << Prefix.c_str() << Formatted.c_str() << Suffix.c_str() << std::endl;
+    std::cout << Prefix.c_str() << Formatted.c_str() << Suffix.c_str();
     va_end(Arguments);
 }
 
