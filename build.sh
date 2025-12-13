@@ -10,6 +10,12 @@ else
     fi
 fi
 
+if [ -n "$2" ]; then
+    TAG_VERSION="$2"
+else
+    TAG_VERSION="unknown"
+fi
+
 if [ "$PRESET" = "x86_64" ]; then
     CONFIG="releasewithsymbols_x86_64"
     CXXFLAGS="-std=c++17 -m64"
@@ -88,6 +94,6 @@ cd ../..
 
 cp libgit2_src/$ZLIB_BUILD/libgit2.a $LIB_PATH
 
-premake5 gmake2
+premake5 gmake2 --tag_version=$TAG_VERSION
 cd $BUILD_PATH
 make config=$CONFIG CXX="g++-10 $ARCH_FLAG" CXXFLAGS="$CXXFLAGS"
