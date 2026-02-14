@@ -1,6 +1,21 @@
 #include "git.h"
 #include "../functions/functions.h"
 #include "../logger/logger.h"
+#include <vector>
+#include <string>
+
+static int CheckoutNotifyCallback(git_checkout_notify_t What, const char *Path, const git_diff_file *,
+                                  const git_diff_file *, const git_diff_file *, void *Payload)
+{
+    if (What == GIT_CHECKOUT_NOTIFY_CONFLICT)
+    {
+        std::vector<std::string> *Conflicts = static_cast<std::vector<std::string> *>(Payload);
+
+        if (Conflicts && Path)
+            Conflicts->push_back(std::string(Path));
+    }
+    return 0;
+}
 
 class GitRemote
 {
@@ -368,7 +383,7 @@ GitCodes GitRepository::Pull()
     {
         const char *TokenPtr = Token.c_str();
         FetchOptions.callbacks.credentials = Git::Functions::CredentialToken;
-        FetchOptions.callbacks.payload = (void *)TokenPtr;
+        FetchOptions.callbacks.Payload = (void *)TokenPtr;
     }
 
     FetchOptions.callbacks.certificate_check = Git::Functions::CertificateCheck;
@@ -438,30 +453,42 @@ GitCodes GitRepository::Pull()
             return GitCodes::FAST_FORWARD_FAILED;
 
         CheckoutOptions.checkout_strategy = GIT_CHECKOUT_SAFE;
+        CheckoutOptions.notify_flags = GIT_CHECKOUT_NOTIFY_CONFLICT;
+
+        std::vector<std::string> Conflicts;
+        CheckoutOptions.notify_cb = CheckoutNotifyCallback;
+        CheckoutOptions.notify_payload = &Conflicts;
 
         if (git_checkout_index(Repository, Index.GetIndex(), &CheckoutOptions) != 0)
         {
-            // Check if there are conflicts in the index
-            if (git_index_has_conflicts(Index.GetIndex()))
+            // Log conflicts collected by the callback
+            for (const auto &ConflictPath : Conflicts)
+            {
+                Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath.c_str());
+            }
+
+            // Also check if there are conflicts in the index (fallback)
+            if (Conflicts.empty() && git_index_has_conflicts(Index.GetIndex()))
             {
                 git_index_conflict_iterator *ConflictIterator = nullptr;
-                
+
                 if (git_index_conflict_iterator_new(&ConflictIterator, Index.GetIndex()) == 0)
                 {
                     const git_index_entry *Ancestor = nullptr;
                     const git_index_entry *Ours = nullptr;
                     const git_index_entry *Theirs = nullptr;
-                    
+
                     while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
                     {
-                        const char *ConflictPath = Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+                        const char *ConflictPath =
+                            Ours ? Ours->Path : (Theirs ? Theirs->Path : (Ancestor ? Ancestor->Path : "unknown"));
                         Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
                     }
-                    
+
                     git_index_conflict_iterator_free(ConflictIterator);
                 }
             }
-            
+
             return GitCodes::FAST_FORWARD_FAILED;
         }
 
@@ -554,30 +581,41 @@ GitCodes GitRepository::Checkout(const std::string &Head)
         return GitCodes::CHECKOUT_FAILED;
 
     git_checkout_options CheckoutOptions = GIT_CHECKOUT_OPTIONS_INIT;
+
     CheckoutOptions.checkout_strategy = GIT_CHECKOUT_SAFE;
+    CheckoutOptions.notify_flags = GIT_CHECKOUT_NOTIFY_CONFLICT;
+
+    std::vector<std::string> Conflicts;
+
+    CheckoutOptions.notify_cb = CheckoutNotifyCallback;
+    CheckoutOptions.notify_payload = &Conflicts;
 
     if (git_checkout_index(Repository, Index.GetIndex(), &CheckoutOptions) != 0)
     {
-        if (git_index_has_conflicts(Index.GetIndex()))
+        for (const auto &ConflictPath : Conflicts)
+            Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath.c_str());
+
+        if (Conflicts.empty() && git_index_has_conflicts(Index.GetIndex()))
         {
             git_index_conflict_iterator *ConflictIterator = nullptr;
-            
+
             if (git_index_conflict_iterator_new(&ConflictIterator, Index.GetIndex()) == 0)
             {
                 const git_index_entry *Ancestor = nullptr;
                 const git_index_entry *Ours = nullptr;
                 const git_index_entry *Theirs = nullptr;
-                
+
                 while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
                 {
-                    const char *ConflictPath = Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+                    const char *ConflictPath =
+                        Ours ? Ours->Path : (Theirs ? Theirs->Path : (Ancestor ? Ancestor->Path : "unknown"));
                     Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
                 }
-                
+
                 git_index_conflict_iterator_free(ConflictIterator);
             }
         }
-        
+
         return GitCodes::CHECKOUT_FAILED;
     }
 
@@ -767,7 +805,7 @@ GitCodes GitRepository::Push()
     {
         const char *TokenPtr = Token.c_str();
         PushOptions.callbacks.credentials = Git::Functions::CredentialToken;
-        PushOptions.callbacks.payload = (void *)TokenPtr;
+        PushOptions.callbacks.Payload = (void *)TokenPtr;
     }
 
     PushOptions.callbacks.certificate_check = Git::Functions::CertificateCheck;
