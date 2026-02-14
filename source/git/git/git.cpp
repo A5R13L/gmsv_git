@@ -440,7 +440,30 @@ GitCodes GitRepository::Pull()
         CheckoutOptions.checkout_strategy = GIT_CHECKOUT_SAFE;
 
         if (git_checkout_index(Repository, Index.GetIndex(), &CheckoutOptions) != 0)
+        {
+            // Check if there are conflicts in the index
+            if (git_index_has_conflicts(Index.GetIndex()))
+            {
+                git_index_conflict_iterator *ConflictIterator = nullptr;
+                
+                if (git_index_conflict_iterator_new(&ConflictIterator, Index.GetIndex()) == 0)
+                {
+                    const git_index_entry *Ancestor = nullptr;
+                    const git_index_entry *Ours = nullptr;
+                    const git_index_entry *Theirs = nullptr;
+                    
+                    while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
+                    {
+                        const char *ConflictPath = Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+                        Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
+                    }
+                    
+                    git_index_conflict_iterator_free(ConflictIterator);
+                }
+            }
+            
             return GitCodes::FAST_FORWARD_FAILED;
+        }
 
         git_reference *BranchReference = nullptr;
 
@@ -534,7 +557,29 @@ GitCodes GitRepository::Checkout(const std::string &Head)
     CheckoutOptions.checkout_strategy = GIT_CHECKOUT_SAFE;
 
     if (git_checkout_index(Repository, Index.GetIndex(), &CheckoutOptions) != 0)
+    {
+        if (git_index_has_conflicts(Index.GetIndex()))
+        {
+            git_index_conflict_iterator *ConflictIterator = nullptr;
+            
+            if (git_index_conflict_iterator_new(&ConflictIterator, Index.GetIndex()) == 0)
+            {
+                const git_index_entry *Ancestor = nullptr;
+                const git_index_entry *Ours = nullptr;
+                const git_index_entry *Theirs = nullptr;
+                
+                while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
+                {
+                    const char *ConflictPath = Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+                    Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
+                }
+                
+                git_index_conflict_iterator_free(ConflictIterator);
+            }
+        }
+        
         return GitCodes::CHECKOUT_FAILED;
+    }
 
     std::string BranchRef = std::string("refs/heads/") + Head;
     git_reference *Temp = nullptr;
