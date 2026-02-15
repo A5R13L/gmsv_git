@@ -481,7 +481,8 @@ GitCodes GitRepository::Pull()
                     while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
                     {
                         const char *ConflictPath =
-                            Ours ? Ours->Path : (Theirs ? Theirs->Path : (Ancestor ? Ancestor->Path : "unknown"));
+                            Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+
                         Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
                     }
 
@@ -608,7 +609,8 @@ GitCodes GitRepository::Checkout(const std::string &Head)
                 while (git_index_conflict_next(&Ancestor, &Ours, &Theirs, ConflictIterator) == 0)
                 {
                     const char *ConflictPath =
-                        Ours ? Ours->Path : (Theirs ? Theirs->Path : (Ancestor ? Ancestor->Path : "unknown"));
+                        Ours ? Ours->path : (Theirs ? Theirs->path : (Ancestor ? Ancestor->path : "unknown"));
+
                     Git::Logger::Log(Git::Logger::Error("Conflict: {red}%s"), ConflictPath);
                 }
 
