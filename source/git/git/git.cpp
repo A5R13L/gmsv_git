@@ -805,7 +805,7 @@ GitCodes GitRepository::Push()
     {
         const char *TokenPtr = Token.c_str();
         PushOptions.callbacks.credentials = Git::Functions::CredentialToken;
-        PushOptions.callbacks.Payload = (void *)TokenPtr;
+        PushOptions.callbacks.payload = (void *)TokenPtr;
     }
 
     PushOptions.callbacks.certificate_check = Git::Functions::CertificateCheck;
