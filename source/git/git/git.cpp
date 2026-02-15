@@ -383,7 +383,7 @@ GitCodes GitRepository::Pull()
     {
         const char *TokenPtr = Token.c_str();
         FetchOptions.callbacks.credentials = Git::Functions::CredentialToken;
-        FetchOptions.callbacks.Payload = (void *)TokenPtr;
+        FetchOptions.callbacks.payload = (void *)TokenPtr;
     }
 
     FetchOptions.callbacks.certificate_check = Git::Functions::CertificateCheck;
